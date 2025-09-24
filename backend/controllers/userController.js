@@ -23,7 +23,12 @@ const loginUser = async (req, res) => {
 
 // signup a user
 const signupUser = async (req, res) => {
-  const {email, password} = req.body
+  const {email, password, password2} = req.body
+
+  // 先验证两次密码是否一致
+  if (password !== password2) {
+    return res.status(400).json({ error: "Passwords do not match" })
+  }
 
   try {
     const user = await User.signup(email, password)
