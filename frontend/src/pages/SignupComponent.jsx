@@ -1,44 +1,20 @@
-// src/pages/Signup.jsx
+// src/pages/SignupComponent.jsx
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import useSignup from "../hooks/useSignup";
 
 const SignupComponent = ({ setIsAuthenticated }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [password2, setPassword2] = useState(""); // 新增状态
-  const navigate = useNavigate();
+  const [password2, setPassword2] = useState("");
+  const { signup, loading, error } = useSignup(setIsAuthenticated);
 
-  const handleSignup = async () => {
-    // 先检查两次密码是否一致
+  const handleSignup = () => {
     if (password !== password2) {
       alert("Passwords do not match!");
       return;
     }
-
-    try {
-      const response = await fetch("/api/users/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password , password2 }),
-      });
-
-      if (response.ok) {
-        const user = await response.json();
-        localStorage.setItem("user", JSON.stringify(user));
-        console.log("User signed up successfully!");
-        setIsAuthenticated(true);
-        navigate("/");
-      } else {
-        console.error("Signup failed", response);
-      }
-    } catch (error) {
-      console.error("Error during signup:", error);
-    }
+    signup(email, password, password2); // 传入 password2
   };
-
 
   return (
     <div className="form-container">
@@ -62,7 +38,7 @@ const SignupComponent = ({ setIsAuthenticated }) => {
       </label>
       <br />
       <label>
-        Confirm Password:   {/* 新增输入框 */}
+        Confirm Password:
         <input
           type="password"
           value={password2}
@@ -70,7 +46,10 @@ const SignupComponent = ({ setIsAuthenticated }) => {
         />
       </label>
       <br />
-      <button onClick={handleSignup}>Sign Up</button>
+      <button onClick={handleSignup} disabled={loading}>
+        {loading ? "Signing Up..." : "Sign Up"}
+      </button>
+      {error && <div style={{ color: "red", marginTop: 10 }}>{error}</div>}
     </div>
   );
 };

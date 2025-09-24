@@ -1,6 +1,7 @@
 // src/hooks/useLogin.js
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import localSession from "../utils/localSession";  // 新增
 
 const useLogin = (setIsAuthenticated) => {
   const [loading, setLoading] = useState(false);
@@ -21,7 +22,7 @@ const useLogin = (setIsAuthenticated) => {
 
       if (response.ok) {
         const user = await response.json();
-        localStorage.setItem("user", JSON.stringify(user));
+        localSession.set("user", user);
         setIsAuthenticated(true);
         navigate("/");
       } else {
